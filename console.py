@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""console Module """
+""" Console Module """
 import cmd
 import sys
 from models.base_model import BaseModel
@@ -10,8 +10,6 @@ from models.state import State
 from models.city import City
 from models.amenity import Amenity
 from models.review import Review
-
-import shlex
 
 
 class HBNBCommand(cmd.Cmd):
@@ -75,7 +73,7 @@ class HBNBCommand(cmd.Cmd):
                 pline = pline[2].strip()  # pline is now str
                 if pline:
                     # check for *args or **kwargs
-                    if pline[0] == '{' and pline[-1] is '}'\
+                    if pline[0] == '{' and pline[-1] =='}'\
                             and type(eval(pline)) is dict:
                         _args = pline
                     else:
@@ -116,27 +114,27 @@ class HBNBCommand(cmd.Cmd):
         pass
 
     def do_create(self, args):
-        """ Create an object
-        """
-        lista = args.split(' ')
+        """ Create an object of any class"""
+        my_list = args.split(' ')
         if not args:
             print("** class name missing **")
             return
-        elif lista[0] not in HBNBCommand.classes:
+        elif my_list[0] not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
-        newins = HBNBCommand.classes[lista[0]]()
-        print(newins.id)
-        for i in lista[1:]:
-            kvp = i.split('=')
-            key = kvp[0]
-            value = kvp[1]
+        new_instance = HBNBCommand.classes[my_list[0]]()
+        print(new_instance.id)
+        for params in my_list[1:]:
+            key_value = params.split('=')
+            key = key_value[0]
+            value = key_value[1]
             table = {
-                34: None,
-                95: 32}
+                34: None,  # Replace " with Nothing
+                95: 32  # Replace _ with space
+            }
             value = value.translate(table)
-            setattr(newins, key, value)
-        newins.save()
+            setattr(new_instance, key, value)
+        new_instance.save()  # Save to storage
 
     def help_create(self):
         """ Help information for the create method """
@@ -332,6 +330,6 @@ class HBNBCommand(cmd.Cmd):
         print("Updates an object with new information")
         print("Usage: update <className> <id> <attName> <attVal>\n")
 
-
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
+
