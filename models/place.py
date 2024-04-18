@@ -1,7 +1,7 @@
 #!/usr/bin/python3
-"""Module for the Place class"""
+"""Module for the Place class."""
 
-from property_models.base_model import BaseModel, Base
+from models.base_model import BaseModel, Base
 from sqlalchemy import Column, String, ForeignKey, Integer, Float, Table
 from sqlalchemy.orm import relationship
 from os import environ
@@ -21,10 +21,11 @@ place_amenity = Table(
         ForeignKey('amenities.id'),
         nullable=False))
 
-storage_type = "PROPERTY_STORAGE_TYPE"
-if storage_type in environ.keys() and environ["PROPERTY_STORAGE_TYPE"] == "db":
+storage_env_variable = "HBNB_TYPE_STORAGE"
+
+if storage_env_variable in environ.keys() and environ[storage_env_variable] == "db":
     class Place(BaseModel, Base):
-        """Class for Place"""
+        """Class for Place representation."""
         __tablename__ = "places"
         city_id = Column(String(60), ForeignKey('cities.id'), nullable=False)
         user_id = Column(String(60), ForeignKey('users.id'), nullable=False)
@@ -41,13 +42,13 @@ if storage_type in environ.keys() and environ["PROPERTY_STORAGE_TYPE"] == "db":
                                  secondary=place_amenity, viewonly=False)
 
         def __init__(self, **kwargs):
-            """Initialization method"""
+            """Initialization of Place."""
             setattr(self, "id", str(uuid4()))
-            for key, value in kwargs.items():
-                setattr(self, key, value)
+            for k, v in kwargs.items():
+                setattr(self, k, v)
 else:
     class Place(BaseModel):
-        """Class for Place"""
+        """Class for Place representation."""
         city_id = ""
         user_id = ""
         name = ""
@@ -62,10 +63,11 @@ else:
 
         @property
         def reviews(self):
-            """Property to retrieve reviews associated with Place"""
-            all_reviews = property_models.storage.all(Review)
+            """Property for reviews."""
+            all_reviews = models.storage.all(Review)
             liste = []
-            for key, value in all_reviews.items():
-                if "Review" == key[0:4] and value.place_id == self.id:
-                    liste.append(value)
+            keys = all_review.items()
+            for i, j in keys:
+                if "Review" == i[0:4] and j.place_id == self.id:
+                    liste.append(j)
             return liste
