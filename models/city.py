@@ -1,16 +1,18 @@
 #!/usr/bin/python3
-"""Module for the City class"""
-from property_models.base_model import BaseModel, Base
-from sqlalchemy import Column, String, ForeignKey, Integer
+"""Module for the City class."""
+
+from models.base_model import BaseModel, Base
+from sqlalchemy import Column, String, ForeignKey
 from sqlalchemy.orm import relationship
 from os import environ
 from uuid import uuid4
 
-storage_type = "PROPERTY_STORAGE_TYPE"
-if storage_type in environ.keys() and environ["PROPERTY_STORAGE_TYPE"] == "db":
+storage_env_variable = "HBNB_TYPE_STORAGE"
+
+if storage_env_variable in environ.keys() and environ[storage_env_variable] == "db":
     class City(BaseModel, Base):
         '''
-        Class defining City attributes
+        City class to store city information.
         '''
         __tablename__ = "cities"
         state_id = Column(String(60), ForeignKey('states.id'), nullable=False)
@@ -19,12 +21,12 @@ if storage_type in environ.keys() and environ["PROPERTY_STORAGE_TYPE"] == "db":
 
         def __init__(self, **kwargs):
             setattr(self, "id", str(uuid4()))
-            for key, value in kwargs.items():
-                setattr(self, key, value)
+            for i, j in kwargs.items():
+                setattr(self, i, j)
 else:
     class City(BaseModel):
         '''
-        Class for City
+        City class to store city information.
         '''
         state_id = ""
         name = ""

@@ -1,26 +1,28 @@
 #!/usr/bin/python3
-"""Module for the State class"""
-import property_models
-from property_models import *
+# Module for the State class.
+
+import models
+from models.base_model import BaseModel, Base
 from sqlalchemy import Column, String
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship
 from os import getenv
 
-
 class State(BaseModel, Base):
+    """State class for storing state information."""
     __tablename__ = "states"
     name = Column(String(128), nullable=False)
 
-    cities = relationship("City", backref="state",
-                          cascade="all, delete, delete-orphan")
+    cities = relationship("City", backref="state", cascade="all, delete, delete-orphan")
 
     def __init__(self, *args, **kwargs):
+        """Initializes an instance of State."""
         super().__init__(*args, **kwargs)
 
-    if getenv('PROPERTY_STORAGE_TYPE', '') != 'db':
+    if getenv('HBNB_TYPE_STORAGE', '') != 'db':
         @property
         def cities(self):
-            all_cities = property_models.storage.all("City")
+            """Property getter for cities."""
+            all_cities = models.storage.all("City")
             temp = []
             for c_id in all_cities:
                 if all_cities[c_id].state_id == self.id:
