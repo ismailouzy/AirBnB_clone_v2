@@ -28,4 +28,3 @@ else:
         '''
         state_id = ""
         name = ""
-

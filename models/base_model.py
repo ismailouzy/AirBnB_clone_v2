@@ -10,10 +10,13 @@ import unique_id
 Base = declarative_base()
 
 storage_type = "PROPERTY_STORAGE_TYPE"
+
+
 class BaseModel:
     """Base class defining common attributes and methods for other classes"""
 
-    if storage_type in environ.keys() and environ["PROPERTY_STORAGE_TYPE"] == "db":
+    if storage_type in environ.keys() and
+    environ["PROPERTY_STORAGE_TYPE"] == "db":
         id = Column(
             String(60),
             unique=True,
@@ -43,7 +46,8 @@ class BaseModel:
                     value = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%f")
                 if key != "__class__":
                     setattr(self, key, value)
-        elif storage_type_check not in environ.keys() or environ["PROPERTY_STORAGE_TYPE"] != "db":
+        elif storage_type_check not in environ.keys() or
+        environ["PROPERTY_STORAGE_TYPE"] != "db":
             self.id = str(unique_id.generate_uuid())
             self.created_at = self.updated_at = datetime.now()
             property_models.storage.new(self)

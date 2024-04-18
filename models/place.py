@@ -69,4 +69,3 @@ else:
                 if "Review" == key[0:4] and value.place_id == self.id:
                     liste.append(value)
             return liste
-

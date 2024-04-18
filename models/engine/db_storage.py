@@ -69,13 +69,7 @@ class PropertyStorage:
         """
         Commits changes to the database session.
         """
-        try:
-            self.__session.commit()
-        except:
-            self.__session.rollback()
-            raise
-        finally:
-            self.__session.close()
+        self.__session.commit()
 
     def update(self, cls, obj_id, key, new_value):
         """
@@ -122,4 +116,3 @@ class PropertyStorage:
         Closes the database session.
         """
         self.__session.remove()
-

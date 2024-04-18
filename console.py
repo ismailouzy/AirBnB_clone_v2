@@ -115,64 +115,28 @@ class HBNBCommand(cmd.Cmd):
         """ Overrides the emptyline method of CMD """
         pass
 
-    def _key_value_parser(self, args):
-        """creates a dictionary from a list of strings"""
-        new_dict = {}
-        for arg in args:
-            if "=" in arg:
-                kvp = arg.split('=', 1)
-                key = kvp[0]
-                value = kvp[1]
-                if value[0] == value[-1] == '"':
-                    value = shlex.split(value)[0].replace('_', ' ')
-                else:
-                    try:
-                        value = int(value)
-                    except:
-                        try:
-                            value = float(value)
-                        except:
-                            continue
-                new_dict[key] = value
-        return new_dict
-
     def do_create(self, args):
-        """ Create an object of any class with given parameters"""
+        """ Create an object
+        """
+        lista = args.split(' ')
         if not args:
             print("** class name missing **")
             return
-
-        # Split arguments into class name and parameters
-        args_list = args.split(' ')
-        class_name = args_list[0]
-
-        # Check if class exists
-        if class_name not in HBNBCommand.classes:
+        elif lista[0] not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
-
-        # Create an instance of the specified class
-        new_instance = HBNBCommand.classes[class_name]()
-
-        # Set attributes based on parameters
-        for param in args_list[1:]:
-            key, value = param.split('=')
-
-            # Unescape double quotes in value
-            value = value.replace('\\"', '"')
-
-            # Replace underscores with spaces in key
-            key = key.replace('_', ' ')
-
-            # Set attribute
-            setattr(new_instance, key, value)
-
-        # Save the new instance to storage
-        new_instance.save()
-
-        # Print the ID of the newly created instance
-        print(new_instance.id)
-
+        newins = HBNBCommand.classes[lista[0]]()
+        print(newins.id)
+        for i in lista[1:]:
+            kvp = i.split('=')
+            key = kvp[0]
+            value = kvp[1]
+            table = {
+                34: None,
+                95: 32}
+            value = value.translate(table)
+            setattr(newins, key, value)
+        newins.save()
 
     def help_create(self):
         """ Help information for the create method """
@@ -367,6 +331,7 @@ class HBNBCommand(cmd.Cmd):
         """ Help information for the update class """
         print("Updates an object with new information")
         print("Usage: update <className> <id> <attName> <attVal>\n")
+
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
