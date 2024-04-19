@@ -25,3 +25,17 @@ class Place(BaseModel, Base):
     # Define the relationships
     city = relationship("City", back_populates="places")
     user = relationship("User", back_populates="places")
+
+    reviews = relationship("Review", cascade="delete", backref="place")
+
+    @property
+    def reviews(self):
+        """ reviews """
+        dict_rev = models.storage.all(models.Review)
+        list_rev = []
+
+        for review in dict_rev.values():
+            if review.place_id == self.id:
+                list_reviews.append(review)
+
+        return review
