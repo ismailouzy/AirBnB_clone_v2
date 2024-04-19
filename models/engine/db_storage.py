@@ -1,101 +1,98 @@
 #!/usr/bin/python3
+""" This modules handles Database Storage """
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, scoped_session
-from sqlalchemy.exc import SQLAlchemyError
 from os import getenv
 from models.base_model import Base
+from models.city import City
+from models.place import Place
+from models.review import Review
+from models.state import State
+from sqlalchemy.orm import sessionmaker, scoped_session
+from models.user import User
+from models.amenity import Amenity
+
 
 class DBStorage:
-    ''' Handles database engine '''
+    '''
+    Handles database engine
+    '''
     __engine = None
     __session = None
 
     def __init__(self):
-        ''' Create engine for database '''
-        self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'
-                                      .format(getenv('HBNB_MYSQL_USER'),
-                                              getenv('HBNB_MYSQL_PWD'),
-                                              getenv('HBNB_MYSQL_HOST'),
-                                              getenv('HBNB_MYSQL_DB')),
-                                      pool_pre_ping=True)
+        '''
+        Create engine for database
+        '''
+        self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'.format(
+            getenv('HBNB_MYSQL_USER'),
+            getenv('HBNB_MYSQL_PWD'),
+            getenv('HBNB_MYSQL_HOST'),
+            getenv('HBNB_MYSQL_DB')),
+            pool_pre_ping=True
+        )
+
         if getenv('HBNB_ENV') == 'test':
             Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
-        ''' query for all objects on the current database session '''
-        from models import base_model
-
-        classes = {'BaseModel': base_model.BaseModel}
-        if cls:
-            classes.update({'User': base_model.User, 'State': base_model.State,
-                            'City': base_model.City, 'Amenity': base_model.Amenity,
-                            'Place': base_model.Place, 'Review': base_model.Review})
-
+        '''
+        query for all objects on the current database session
+        '''
+        classes = {
+            "City": City,
+            "State": State,
+            "User": User,
+            "Place": Place,
+            "Review": Review,
+            "Amenity": Amenity,
+        }
         result = {}
+        query_rows = []
+
         if cls:
-            if isinstance(cls, str):
-                cls = classes.get(cls, None)
-            if cls:
-                try:
-                    query_rows = self.__session.query(cls).all()
-                    for obj in query_rows:
-                        key = '{}.{}'.format(type(obj).__name__, obj.id)
-                        result[key] = obj
-                except SQLAlchemyError as e:
-                    # Handle database errors
-                    print(f"An error occurred: {e}")
+            '''Query for all objects belonging to cls'''
+            if type(cls) is str:
+                cls = eval(cls)
+            query_rows = self.__session.query(cls)
+            for obj in query_rows:
+                key = '{}.{}'.format(type(obj).__name__, obj.id)
+                result[key] = obj
+            return result
         else:
+            '''Query for all types of objects'''
             for name, value in classes.items():
-                try:
-                    query_rows = self.__session.query(value).all()
-                    for obj in query_rows:
-                        key = '{}.{}'.format(name, obj.id)
-                        result[key] = obj
-                except SQLAlchemyError as e:
-                    # Handle database errors
-                    print(f"An error occurred: {e}")
-        return result
+                query_rows = self.__session.query(value)
+                for obj in query_rows:
+                    key = '{}.{}'.format(name, obj.id)
+                    result[key] = obj
+            return result
 
     def new(self, obj):
-        ''' add the object to the current database session '''
-        try:
-            self.__session.add(obj)
-        except SQLAlchemyError as e:
-            # Handle database errors
-            print(f"An error occurred: {e}")
+        '''add the object to the current database session'''
+        self.__session.add(obj)
 
     def save(self):
-        ''' commit all changes of the current database session '''
-        try:
-            self.__session.commit()
-        except SQLAlchemyError as e:
-            # Handle database errors
-            print(f"An error occurred: {e}")
+        '''commit all changes of the current database session'''
+        self.__session.commit()
 
     def delete(self, obj=None):
-        ''' delete obj from the current database session '''
-        if obj:
-            try:
-                self.__session.delete(obj)
-            except SQLAlchemyError as e:
-                # Handle database errors
-                print(f"An error occurred: {e}")
+        '''delete obj from the current database session'''
+        self.__session.delete(obj)
 
     def reload(self):
-        ''' create all tables in the database '''
-        try:
-            Base.metadata.create_all(self.__engine)
-            session_factory = sessionmaker(bind=self.__engine, expire_on_commit=False)
-            Session = scoped_session(session_factory)
-            self.__session = Session()
-        except SQLAlchemyError as e:
-            # Handle database errors
-            print(f"An error occurred: {e}")
+        '''
+        - create all tables in the database
+        - create the current database session from the engine
+        '''
+        Base.metadata.create_all(self.__engine)
+        session_factory = sessionmaker(
+            bind=self.__engine, expire_on_commit=False)
+        Session = scoped_session(session_factory)
+        self.__session = Session()
 
     def close(self):
-        ''' close the session '''
-        try:
-            self.__session.close()
-        except SQLAlchemyError as e:
-            # Handle database errors
-            print(f"An error occurred: {e}")
+        """
+        Because SQLAlchemy doesn't reload his `Session`
+        when it's time to insert new data, we force it to!
+        """
+        self.__session.close()
