@@ -212,31 +212,33 @@ class HBNBCommand(cmd.Cmd):
         print_list = []
 
         if args:
-            args = args.split(' ')[0]  # remove possible trailing args
-            if args not in HBNBCommand.classes:
+            class_name = args.split()[0]
+            if class_name not in HBNBCommand.classes:
                 print("** class doesn't exist **")
                 return
-            for k, v in storage._FileStorage__objects.items():
-                if k.split('.')[0] == args:
-                    print_list.append(str(v))
+            objects = storage.all(class_name)
+            for obj in objects.values():
+                print_list.append(str(obj))
         else:
-            for k, v in storage._FileStorage__objects.items():
-                print_list.append(str(v))
+            for class_name in HBNBCommand.classes:
+                objects = storage.all(class_name)
+                for obj in objects.values():
+                    print_list.append(str(obj))
 
         print(print_list)
+    
+        def help_all(self):
+            """ Help information for the all command """
+            print("Shows all objects, or all of a class")
+            print("[Usage]: all <className>\n")
 
-    def help_all(self):
-        """ Help information for the all command """
-        print("Shows all objects, or all of a class")
-        print("[Usage]: all <className>\n")
-
-    def do_count(self, args):
-        """Count current number of class instances"""
-        count = 0
-        for k, v in storage._FileStorage__objects.items():
-            if args == k.split('.')[0]:
-                count += 1
-        print(count)
+        def do_count(self, args):
+            """Count current number of class instances"""
+            count = 0
+            for k, v in storage._FileStorage__objects.items():
+                if args == k.split('.')[0]:
+                    count += 1
+            print(count)
 
     def help_count(self):
         """ """
