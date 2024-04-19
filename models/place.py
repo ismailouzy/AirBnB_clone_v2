@@ -7,14 +7,6 @@ from models.city import City
 from models.user import User
 from models.amenity import Amenity
 
-place_amenity = Table('place_amenity', Base.metadata,
-                      Column('place_id', String(60), ForeignKey('places.id'),
-                             primary_key=True, nullable=False),
-                      Column('amenity_id', String(60),
-                             ForeignKey('amenities.id'),
-                             primary_key=True, nullable=False)
-                      )
-
 
 class Place(BaseModel, Base):
     """ A place to stay """
@@ -36,8 +28,6 @@ class Place(BaseModel, Base):
     user = relationship("User", back_populates="places")
 
     reviews = relationship("Review", cascade="delete", backref="place")
-    amenities = relationship("Amenity", secondary='place_amenity',
-                             back_populates="place_amenities", viewonly=False)
 
     @property
     def reviews(self):
@@ -50,18 +40,3 @@ class Place(BaseModel, Base):
                 list_reviews.append(review)
 
         return review
-
-    @property
-    def amenities(self):
-        """ Getter attribute for amenities in FileStorage """
-        amenity_list = []
-        for amenity in storage.all(Amenity).values():
-            if amenity.id in self.amenity_ids:
-                amenity_list.append(amenity)
-        return amenity_list
-
-    @amenities.setter
-    def amenities(self, obj=None):
-        """ Setter attribute for amenities in FileStorage """
-        if isinstance(obj, Amenity):
-            self.amenity_ids.append(obj.id)
