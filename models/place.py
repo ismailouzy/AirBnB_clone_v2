@@ -5,6 +5,8 @@ from sqlalchemy import Column, String, Integer, Float, ForeignKey, Table
 from sqlalchemy.orm import relationship
 from os import getenv
 from models.amenity import Amenity
+from models.city import City
+from models.user import User
 
 place_amenity = Table('place_amenity', Base.metadata,
                       Column('place_id', String(60),
@@ -44,6 +46,13 @@ class Place(BaseModel, Base):
             '''FileStorage relationship between Place and Review'''
             from models import storage
             from models.review import Review
+    # Define the relationships
+    city = relationship("City", back_populates="places")
+    user = relationship("User", back_populates="places")
+
+    reviews = relationship("Review", cascade="delete", backref="place")
+    amenities = relationship("Amenity", secondary=place_amenity,
+                             viewonly=False)
 
             review_list = []
             review_dict = storage.all(Review)
@@ -69,3 +78,26 @@ class Place(BaseModel, Base):
             '''
             if type(obj) is Amenity and obj.id not in self.amenity_ids:
                 self.amenity_ids.append(obj.id)
+        return review
+
+    @property
+    def amenities(self):
+        """Getter attribute that returns the list of Amenity instances based on
+        the attribute amenity_ids that contains all Amenity.id linked to the
+        Place.
+        """
+        from models import storage
+        my_list = []
+        extracted_amenities = storage.all('Amenity').values()
+        for amenity in extracted_amenities:
+            if self.id == amenity.amenity_ids:
+                my_list.append(amenity)
+        return my_list
+
+    @amenities.setter
+    def amenities(self, obj):
+        """Setter attribute that handles append method for adding an Amenity.id
+        to the attribute amenity_ids.
+        """
+        if isinstance(obj, 'Amenity'):
+            self.amenity_id.append(obj.id)
