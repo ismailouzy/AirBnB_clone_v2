@@ -7,7 +7,7 @@ archive to the web servers
 from fabric.api import put, run, env
 from os.path import exists, basename, splitext
 
-env.hosts = ['107.21.39.78', '100.24.255.89']
+env.hosts = ['100.24.255.89', '107.21.39.78']
 
 
 def do_deploy(archive_path):
@@ -21,6 +21,7 @@ def do_deploy(archive_path):
         path = "/data/web_static/releases/"
 
         put(archive_path, '/tmp/')
+        run("rm -rf {}{}/".format(path, no_ext))
         run('mkdir -p {}{}/'.format(path, no_ext))
         run('tar -xzf /tmp/{} -C {}{}/'.format(
             filename, path, no_ext))
@@ -33,5 +34,5 @@ def do_deploy(archive_path):
             path, no_ext))
 
         return True
-    except FileNotFoundError:
+    except Exception:
         return False
