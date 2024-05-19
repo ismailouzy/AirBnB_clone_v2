@@ -96,7 +96,7 @@ def state_list():
             'states': sorted(storage.all(State).values(), key=State.name)
             }
 
-    return render_template("6-number_odd_or_even.html", **states_dic)
+    return render_template("7-states_list.html", **states_dic)
 
 
 @app.teardown_appcontext
