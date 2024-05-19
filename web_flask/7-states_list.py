@@ -92,8 +92,10 @@ def state_list():
             @id: state id
             @name: state name
     """
+    list_state = list(storage.all(State).values())
+    list_state.sort(key=lambda x: x.name)
     states_dic = {
-            'states': sorted(storage.all(State).values(), key=State.name)
+            'states': list_state
             }
 
     return render_template("7-states_list.html", **states_dic)
