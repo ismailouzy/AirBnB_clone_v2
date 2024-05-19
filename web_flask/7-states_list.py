@@ -99,7 +99,7 @@ def state_list():
     return render_template("6-number_odd_or_even.html", **states_dic)
 
 
-@app.teardown_appcontext()
+@app.teardown_appcontext
 def teardown_app(appexc):
     """close the storage session"""
     storage.close()
