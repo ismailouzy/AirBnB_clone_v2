@@ -3,11 +3,12 @@
 Airbnb clone flask application
 """
 
-from flask import Flask, abort, request, render_template
+from flask import Flask
+
 app = Flask(__name__)
 
 
-@app.route('/', strict_slashes=False)
+@app.route('/airbnb-onepage/', strict_slashes=False)
 def index():
     """index page of the Airbnb clone"""
     return 'Hello HBNB!'
